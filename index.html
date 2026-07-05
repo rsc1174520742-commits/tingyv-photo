@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="听雨的漫展场照、棚拍人像与后期视觉作品展示。专注于漫展现场摄影、棚拍人像和后期合成。"
+    />
+    <meta name="keywords" content="漫展摄影,棚拍人像,后期合成,cosplay摄影,听雨摄影" />
+    <meta name="author" content="听雨" />
+    <meta name="asset-version" content="hires-layout-20260705" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="听雨 | 漫展摄影与后期展示" />
+    <meta property="og:description" content="从现场捕捉到棚拍质感，再进入氛围合成与后期强化。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="./assets/images/bg/hero.jpg" />
+    <meta property="og:locale" content="zh_CN" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="听雨 | 漫展摄影与后期展示" />
+    <meta name="twitter:description" content="从现场捕捉到棚拍质感，再进入氛围合成与后期强化。" />
+    <meta name="twitter:image" content="./assets/images/bg/hero.jpg" />
+
+    <title>听雨 | 漫展摄影与后期展示</title>
+    <link
+      rel="icon"
+      href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="%2307090d"/><circle cx="32" cy="32" r="21" fill="none" stroke="%23e05a2b" stroke-width="4"/><text x="32" y="38" text-anchor="middle" font-size="18" fill="%23f3efe7" font-family="serif">CF</text></svg>'
+    />
+    <link rel="preload" href="./assets/images/bg/hero.jpg" as="image" />
+    <link rel="stylesheet" href="./styles.css" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "听雨",
+      "jobTitle": "摄影师",
+      "description": "专注漫展现场摄影、棚拍人像与后期合成的摄影师",
+      "knowsAbout": ["漫展摄影", "棚拍人像", "后期合成", "视觉设计"],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "预约咨询",
+        "availableLanguage": "zh-CN"
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <canvas class="atmosphere-canvas" id="atmosphereCanvas" aria-hidden="true"></canvas>
+
+    <header class="site-header" data-reveal>
+      <a class="brand" href="#top" aria-label="返回首页">
+        <span class="brand-mark">CF</span>
+        <span class="brand-text">听雨 / Convention Framework</span>
+      </a>
+      <nav class="nav-links" aria-label="主要导航">
+        <a href="#event">场照</a>
+        <a href="#studio">棚拍</a>
+        <a href="#retouch">后期</a>
+        <a href="#service">约拍</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="hero-shade" aria-hidden="true"></div>
+        <div class="hero-content" data-reveal>
+          <p class="eyebrow">Event Frames / Studio Portrait / Retouch Showcase</p>
+          <h1 id="heroTitle">
+            <span class="artist-name">听雨</span>
+            <span class="hero-title-line">漫展摄影与后期视觉作品</span>
+          </h1>
+          <p class="hero-copy">
+            从现场捕捉到棚拍质感，再进入氛围合成与后期强化。
+          </p>
+          <div class="hero-actions" aria-label="作品入口">
+            <a class="button primary" href="#event">查看场照记录</a>
+            <a class="button ghost" href="#studio">浏览棚拍人像</a>
+            <a class="button ghost" href="#retouch">后期作品</a>
+          </div>
+        </div>
+        <div class="hero-panel" data-reveal>
+          <span class="panel-label">Current Archive</span>
+          <strong id="archiveCount">0</strong>
+          <span>selected frames</span>
+        </div>
+        <div class="scroll-cue" aria-hidden="true">
+          <span></span>
+        </div>
+      </section>
+
+      <section class="intro-band" aria-label="作品方向" data-reveal>
+        <div>
+          <span class="section-kicker">Visual Direction</span>
+          <h2>从现场到影棚，从真实到艺术</h2>
+        </div>
+        <p>
+          每一次快门都是对瞬间的捕捉，每一次后期都是对情绪的强化。
+          场照记录现场的真实氛围，棚拍呈现角色的质感细节，后期则将视觉推向极致。
+        </p>
+      </section>
+
+      <section class="work-section" id="event" aria-labelledby="eventTitle">
+        <div class="section-head" data-reveal>
+          <div>
+            <span class="section-kicker">Event Frames</span>
+            <h2 id="eventTitle">场照记录</h2>
+          </div>
+          <p>保留漫展现场的光线、姿态和瞬间感，作为整个作品序列的第一层叙事。</p>
+        </div>
+        <div class="gallery event" id="eventGallery" aria-label="场照记录图库" role="list"></div>
+      </section>
+
+      <section class="work-section studio-section" id="studio" aria-labelledby="studioTitle">
+        <div class="section-head" data-reveal>
+          <div>
+            <span class="section-kicker">Studio Portrait</span>
+            <h2 id="studioTitle">棚拍人像</h2>
+          </div>
+          <p>更稳定的光线、更干净的背景和更明确的角色质感，承接场照与后期之间的过渡。</p>
+        </div>
+        <div class="gallery studio" id="studioGallery" aria-label="棚拍人像图库" role="list"></div>
+      </section>
+
+      <section class="work-section" id="retouch" aria-labelledby="retouchTitle">
+        <div class="section-head" data-reveal>
+          <div>
+            <span class="section-kicker">Retouch Gallery</span>
+            <h2 id="retouchTitle">后期作品</h2>
+          </div>
+          <p>色调、皮肤、背景氛围和合成强化。点击任意作品进入沉浸式浏览。</p>
+        </div>
+        <div class="gallery featured" id="retouchGallery" aria-label="后期作品图库" role="list"></div>
+      </section>
+
+      <section class="process-section" id="service" aria-labelledby="serviceTitle">
+        <div class="section-head compact" data-reveal>
+          <div>
+            <span class="section-kicker">Workflow</span>
+            <h2 id="serviceTitle">拍摄与后期服务</h2>
+          </div>
+        </div>
+        <div class="service-grid" data-reveal>
+          <article class="service-item">
+            <span>01</span>
+            <h3>场照调色</h3>
+            <p>普通 15r/张，包含基础调色与整体影调统一。</p>
+          </article>
+          <article class="service-item">
+            <span>02</span>
+            <h3>场照精修</h3>
+            <p>30r/张，包含修脸、去杂和观感优化。</p>
+          </article>
+          <article class="service-item">
+            <span>03</span>
+            <h3>后期特效</h3>
+            <p>小特效 80 起，大合成 299 封顶。</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" data-reveal>
+      <div class="footer-copy">
+        <span class="section-kicker">Booking</span>
+        <h2>听雨 · 约拍与后期委托</h2>
+        <p>扫码添加或点击复制联系方式。</p>
+      </div>
+      <div class="contact-cluster" aria-label="联系方式">
+        <article class="qr-card">
+          <img src="./assets/images/qr/qq.png" alt="听雨 QQ 二维码" loading="lazy" />
+          <div>
+            <span>QQ</span>
+            <strong>1174520742</strong>
+            <button class="copy-contact" type="button" data-copy="1174520742">复制 QQ</button>
+          </div>
+        </article>
+        <article class="qr-card">
+          <img src="./assets/images/qr/wechat.png" alt="听雨 微信二维码" loading="lazy" />
+          <div>
+            <span>微信</span>
+            <strong>OnlyLove2B</strong>
+            <button class="copy-contact" type="button" data-copy="OnlyLove2B">复制微信</button>
+          </div>
+        </article>
+      </div>
+    </footer>
+
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="作品预览" hidden>
+      <button class="lightbox-close" type="button" aria-label="关闭预览">×</button>
+      <button class="lightbox-nav prev" type="button" aria-label="上一张">‹</button>
+      <figure class="lightbox-figure">
+        <div class="lightbox-loader" id="lightboxLoader" hidden>
+          <div class="loader-spinner"></div>
+        </div>
+        <img id="lightboxImage" src="" alt="" />
+        <figcaption id="lightboxCaption"></figcaption>
+        <div class="lightbox-counter" id="lightboxCounter"></div>
+      </figure>
+      <button class="lightbox-nav next" type="button" aria-label="下一张">›</button>
+    </div>
+
+    <script src="./assets/gallery-data.js"></script>
+    <script src="./app.js" defer></script>
+  </body>
+</html>
