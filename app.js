@@ -19,7 +19,7 @@ const galleryConfig = [
   },
 ];
 
-const ASSET_VERSION = "hires-layout-20260705";
+const ASSET_VERSION = "protected-layout-20260708";
 const galleryData = window.galleryData || { event: [], studio: [], post: [] };
 const allItems = [];
 let currentIndex = 0;
@@ -32,11 +32,31 @@ const lightboxImage = document.querySelector("#lightboxImage");
 const lightboxCaption = document.querySelector("#lightboxCaption");
 const lightboxCounter = document.querySelector("#lightboxCounter");
 const lightboxLoader = document.querySelector("#lightboxLoader");
+const lightboxBackdrop = document.querySelector("#lightboxBackdrop");
+const lightboxFilmstrip = document.querySelector("#lightboxFilmstrip");
 const closeButton = document.querySelector(".lightbox-close");
 const prevButton = document.querySelector(".lightbox-nav.prev");
 const nextButton = document.querySelector(".lightbox-nav.next");
 const heroBg = document.querySelector(".hero-bg");
 const archiveCount = document.querySelector("#archiveCount");
+const siteHeader = document.querySelector(".site-header");
+const navLinks = [...document.querySelectorAll(".nav-links a")];
+const soundToggle = document.querySelector("#soundToggle");
+const ambientTracks = [
+  {
+    title: "Episode 33",
+    src: "./assets/audio/episode-33.mp3",
+  },
+  {
+    title: "I Really Want to Stay at Your House",
+    src: "./assets/audio/stay-at-your-house.mp3",
+  },
+];
+let ambientAudio = null;
+let ambientTrackIndex = 0;
+let shouldKeepAmbientPlaying = true;
+let pendingAutoplayRecovery = false;
+let lastFocusedTile = null;
 
 function throttle(func, wait) {
   let timeout = null;
@@ -90,6 +110,7 @@ function renderGallery(config) {
     button.type = "button";
     button.className = `photo-tile ${item.tile || getTileClass(index, config.shape)}`;
     button.dataset.index = String(offset + index);
+    button.style.transitionDelay = `${Math.min(index * 42, 360)}ms`;
     button.setAttribute("role", "listitem");
     button.setAttribute("aria-label", `\u67e5\u770b${item.category}${index + 1}`);
 
@@ -110,6 +131,34 @@ function renderGallery(config) {
   });
 
   container.append(fragment);
+}
+
+function renderFilmstrip() {
+  if (!lightboxFilmstrip) return;
+
+  const fragment = document.createDocumentFragment();
+  allItems.forEach((item, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "filmstrip-thumb";
+    button.dataset.index = String(index);
+    button.setAttribute("aria-label", `跳转到${item.category}${index + 1}`);
+
+    const img = document.createElement("img");
+    img.src = versionedAsset(item.thumb);
+    img.alt = "";
+    img.loading = "lazy";
+    img.decoding = "async";
+
+    button.append(img);
+    button.addEventListener("click", () => {
+      currentIndex = index;
+      updateLightbox();
+    });
+    fragment.append(button);
+  });
+
+  lightboxFilmstrip.replaceChildren(fragment);
 }
 
 function getTileClass(index, shapeName) {
@@ -161,17 +210,18 @@ function preloadAdjacentImages(index) {
     const adjacentIndex = (index + i + allItems.length) % allItems.length;
     const item = allItems[adjacentIndex];
     if (item) {
-      toPreload.push(preloadImage(versionedAsset(item.large)));
+      toPreload.push(preloadImage(versionedAsset(item.display)));
     }
   }
   Promise.all(toPreload).catch(() => {});
 }
 
 function openLightbox(index) {
+  lastFocusedTile = document.activeElement;
   currentIndex = index;
-  updateLightbox();
   lightbox.hidden = false;
   document.body.classList.add("lightbox-open");
+  updateLightbox();
   closeButton.focus();
   preloadAdjacentImages(index);
 }
@@ -180,6 +230,10 @@ function closeLightbox() {
   lightbox.hidden = true;
   document.body.classList.remove("lightbox-open");
   lightboxImage.src = "";
+  if (lightboxBackdrop) lightboxBackdrop.src = "";
+  if (lastFocusedTile && typeof lastFocusedTile.focus === "function") {
+    lastFocusedTile.focus();
+  }
 }
 
 function updateLightbox() {
@@ -187,24 +241,48 @@ function updateLightbox() {
   if (!item) return;
 
   lightboxLoader.hidden = false;
-  lightboxImage.style.opacity = '0';
+  lightbox.classList.add("is-changing");
+  lightboxImage.style.opacity = "0";
+  if (lightboxBackdrop) {
+    lightboxBackdrop.src = versionedAsset(item.thumb);
+  }
+  updateFilmstripState();
 
   const img = new Image();
   img.onload = () => {
-    lightboxImage.src = versionedAsset(item.large);
+    const displayUrl = versionedAsset(item.display);
+    lightboxImage.src = displayUrl;
+    if (lightboxBackdrop) lightboxBackdrop.src = displayUrl;
     lightboxImage.alt = `${item.category} - ${item.title}`;
     lightboxCaption.textContent = `${item.category} / ${item.title}`;
     lightboxCounter.textContent = `${currentIndex + 1} / ${allItems.length}`;
     lightboxLoader.hidden = true;
-    lightboxImage.style.opacity = '1';
+    window.requestAnimationFrame(() => {
+      lightbox.classList.remove("is-changing");
+      lightboxImage.style.opacity = "1";
+    });
     preloadAdjacentImages(currentIndex);
   };
   img.onerror = () => {
     lightboxLoader.hidden = true;
-    lightboxImage.style.opacity = '1';
+    lightbox.classList.remove("is-changing");
+    lightboxImage.style.opacity = "1";
     lightboxCaption.textContent = `${item.category} / ${item.title} (加载失败)`;
   };
-  img.src = versionedAsset(item.large);
+  img.src = versionedAsset(item.display);
+}
+
+function updateFilmstripState() {
+  if (!lightboxFilmstrip) return;
+
+  lightboxFilmstrip.querySelectorAll(".filmstrip-thumb").forEach((button) => {
+    const isActive = Number(button.dataset.index) === currentIndex;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-current", isActive ? "true" : "false");
+    if (isActive) {
+      button.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  });
 }
 
 function showPrev() {
@@ -256,6 +334,8 @@ function setupReveal() {
 
 function setupParallax() {
   let rafId = 0;
+  const heroContent = document.querySelector(".hero-content");
+  const heroPanel = document.querySelector(".hero-panel");
 
   window.addEventListener(
     "scroll",
@@ -263,12 +343,79 @@ function setupParallax() {
       if (rafId) return;
       rafId = requestAnimationFrame(() => {
         const offset = Math.min(window.scrollY, window.innerHeight);
-        heroBg.style.transform = `scale(1.05) translateY(${offset * 0.08}px)`;
+        const progress = offset / Math.max(window.innerHeight, 1);
+        if (heroBg) {
+          heroBg.style.transform = `scale(${1.05 + progress * 0.055}) translateY(${offset * 0.06}px)`;
+        }
+        if (heroContent) {
+          heroContent.style.transform = `translateY(${offset * -0.035}px)`;
+        }
+        if (heroPanel) {
+          heroPanel.style.transform = `translateY(${offset * -0.02}px)`;
+        }
+        if (siteHeader) {
+          siteHeader.classList.toggle("is-scrolled", window.scrollY > 24);
+        }
         rafId = 0;
       });
     },
     { passive: true },
   );
+}
+
+function setupActiveNavigation() {
+  const sections = navLinks
+    .map((link) => document.querySelector(link.getAttribute("href")))
+    .filter(Boolean);
+  let rafId = 0;
+
+  const updateActiveLink = () => {
+    const marker = window.innerHeight * 0.42;
+    let current = sections[0];
+    sections.forEach((section) => {
+      if (section.getBoundingClientRect().top <= marker) {
+        current = section;
+      }
+    });
+
+    navLinks.forEach((link) => {
+      const isActive = current && link.getAttribute("href") === `#${current.id}`;
+      link.classList.toggle("is-active", isActive);
+      if (isActive) {
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+  };
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        updateActiveLink();
+        rafId = 0;
+      });
+    },
+    { passive: true },
+  );
+
+  window.addEventListener("resize", updateActiveLink);
+  updateActiveLink();
+}
+
+function setupGalleryFocus() {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        entry.target.classList.toggle("is-near", entry.isIntersecting);
+      });
+    },
+    { rootMargin: "-18% 0px -18% 0px", threshold: 0.38 },
+  );
+
+  document.querySelectorAll(".photo-tile").forEach((tile) => observer.observe(tile));
 }
 
 function setupAtmosphereCanvas() {
@@ -408,10 +555,129 @@ function setupCopyButtons() {
   });
 }
 
+function setupAssetGuards() {
+  const protectedMedia = document.querySelectorAll(
+    ".photo-tile img, .filmstrip-thumb img, #lightboxImage, #lightboxBackdrop",
+  );
+
+  protectedMedia.forEach((media) => {
+    media.setAttribute("draggable", "false");
+    media.addEventListener("dragstart", (event) => event.preventDefault());
+    media.addEventListener("contextmenu", (event) => event.preventDefault());
+  });
+
+  document.querySelectorAll(".gallery, .lightbox").forEach((container) => {
+    container.addEventListener("contextmenu", (event) => {
+      if (event.target instanceof HTMLImageElement) {
+        event.preventDefault();
+      }
+    });
+  });
+}
+
+function setupAmbientAudio() {
+  if (!soundToggle) return;
+
+  ambientAudio = new Audio(versionedAsset(ambientTracks[ambientTrackIndex].src));
+  ambientAudio.loop = false;
+  ambientAudio.preload = "metadata";
+  ambientAudio.volume = 0.14;
+
+  const setAudioState = (isOn, label = isOn ? "关闭背景音乐" : "开启背景音乐") => {
+    soundToggle.dataset.state = isOn ? "on" : "off";
+    soundToggle.setAttribute("aria-pressed", String(isOn));
+    soundToggle.setAttribute("aria-label", label);
+    soundToggle.querySelector(".sound-label").textContent = isOn ? "Playing" : "Music";
+  };
+
+  const updateAudioSource = () => {
+    ambientAudio.src = versionedAsset(ambientTracks[ambientTrackIndex].src);
+    ambientAudio.load();
+  };
+
+  const clearAutoplayRecovery = () => {
+    if (!pendingAutoplayRecovery) return;
+    pendingAutoplayRecovery = false;
+    ["pointerdown", "keydown", "touchstart"].forEach((eventName) => {
+      document.removeEventListener(eventName, resumeOnFirstInteraction, true);
+    });
+  };
+
+  async function startAmbientPlayback() {
+    try {
+      await ambientAudio.play();
+      setAudioState(true);
+      clearAutoplayRecovery();
+      return true;
+    } catch {
+      setAudioState(false, "浏览器阻止了自动播放，点击后继续");
+      return false;
+    }
+  }
+
+  async function resumeOnFirstInteraction(event) {
+    if (!shouldKeepAmbientPlaying) return;
+    if (event?.target?.closest?.("#soundToggle")) return;
+    const started = await startAmbientPlayback();
+    if (started) {
+      clearAutoplayRecovery();
+    }
+  }
+
+  const scheduleAutoplayRecovery = () => {
+    if (pendingAutoplayRecovery || !shouldKeepAmbientPlaying) return;
+    pendingAutoplayRecovery = true;
+    ["pointerdown", "keydown", "touchstart"].forEach((eventName) => {
+      document.addEventListener(eventName, resumeOnFirstInteraction, {
+        capture: true,
+        once: true,
+      });
+    });
+  };
+
+  const playTrackAtIndex = async (nextIndex) => {
+    ambientTrackIndex = (nextIndex + ambientTracks.length) % ambientTracks.length;
+    updateAudioSource();
+    return startAmbientPlayback();
+  };
+
+  ambientAudio.addEventListener("ended", async () => {
+    if (!shouldKeepAmbientPlaying) return;
+    await playTrackAtIndex(ambientTrackIndex + 1);
+  });
+
+  soundToggle.addEventListener("click", async () => {
+    const shouldPlay = soundToggle.dataset.state !== "on";
+    try {
+      if (shouldPlay) {
+        shouldKeepAmbientPlaying = true;
+        await startAmbientPlayback();
+        localStorage.setItem("tingyuAmbientAudio", "on");
+      } else {
+        shouldKeepAmbientPlaying = false;
+        ambientAudio.pause();
+        clearAutoplayRecovery();
+        setAudioState(false);
+        localStorage.setItem("tingyuAmbientAudio", "off");
+      }
+    } catch {
+      setAudioState(false, "浏览器阻止了音乐播放，请再次点击");
+    }
+  });
+
+  setAudioState(false);
+  startAmbientPlayback().then((started) => {
+    if (!started) {
+      scheduleAutoplayRecovery();
+    }
+  });
+}
+
 function init() {
   try {
     galleryConfig.forEach(renderGallery);
     if (archiveCount) archiveCount.textContent = String(allItems.length);
+    renderFilmstrip();
 
     closeButton.addEventListener("click", closeLightbox);
     prevButton.addEventListener("click", showPrev);
@@ -432,8 +698,12 @@ function init() {
 
     setupReveal();
     setupParallax();
+    setupActiveNavigation();
+    setupGalleryFocus();
     setupAtmosphereCanvas();
     setupCopyButtons();
+    setupAssetGuards();
+    setupAmbientAudio();
   } catch (error) {
     console.error('初始化失败:', error);
   }

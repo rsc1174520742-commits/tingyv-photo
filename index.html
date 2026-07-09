@@ -9,7 +9,7 @@
     />
     <meta name="keywords" content="漫展摄影,棚拍人像,后期合成,cosplay摄影,听雨摄影" />
     <meta name="author" content="听雨" />
-    <meta name="asset-version" content="hires-layout-20260705" />
+    <meta name="asset-version" content="protected-layout-20260708" />
 
     <!-- Open Graph -->
     <meta property="og:title" content="听雨 | 漫展摄影与后期展示" />
@@ -51,6 +51,17 @@
   </head>
   <body>
     <canvas class="atmosphere-canvas" id="atmosphereCanvas" aria-hidden="true"></canvas>
+    <button
+      class="sound-toggle"
+      id="soundToggle"
+      type="button"
+      aria-label="开启背景音乐"
+      aria-pressed="false"
+      data-state="off"
+    >
+      <span class="sound-icon" aria-hidden="true"></span>
+      <span class="sound-label">Music</span>
+    </button>
 
     <header class="site-header" data-reveal>
       <a class="brand" href="#top" aria-label="返回首页">
@@ -192,6 +203,7 @@
     </footer>
 
     <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="作品预览" hidden>
+      <img class="lightbox-backdrop" id="lightboxBackdrop" src="" alt="" aria-hidden="true" />
       <button class="lightbox-close" type="button" aria-label="关闭预览">×</button>
       <button class="lightbox-nav prev" type="button" aria-label="上一张">‹</button>
       <figure class="lightbox-figure">
@@ -202,6 +214,7 @@
         <figcaption id="lightboxCaption"></figcaption>
         <div class="lightbox-counter" id="lightboxCounter"></div>
       </figure>
+      <div class="lightbox-filmstrip" id="lightboxFilmstrip" aria-label="作品缩略导航"></div>
       <button class="lightbox-nav next" type="button" aria-label="下一张">›</button>
     </div>
 
