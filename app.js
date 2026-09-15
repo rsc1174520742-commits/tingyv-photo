@@ -17,10 +17,16 @@ const galleryConfig = [
     category: "\u540e\u671f\u4f5c\u54c1",
     shape: "featured",
   },
+  {
+    key: "outdoor",
+    container: "#outdoorGallery",
+    category: "外景作品",
+    shape: "outdoor",
+  },
 ];
 
-const ASSET_VERSION = "protected-layout-20260708";
-const galleryData = window.galleryData || { event: [], studio: [], post: [] };
+const ASSET_VERSION = "protected-gallery-20260915";
+const galleryData = window.galleryData || { event: [], studio: [], post: [], outdoor: [] };
 const allItems = [];
 let currentIndex = 0;
 let touchStartX = 0;
