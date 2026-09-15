@@ -25,7 +25,7 @@ const galleryConfig = [
   },
 ];
 
-const ASSET_VERSION = "protected-gallery-20260915";
+const ASSET_VERSION = "protected-gallery-sync-20260915-2";
 const galleryData = window.galleryData || { event: [], studio: [], post: [], outdoor: [] };
 const allItems = [];
 let currentIndex = 0;
