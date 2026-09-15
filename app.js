@@ -25,7 +25,7 @@ const galleryConfig = [
   },
 ];
 
-const ASSET_VERSION = "protected-gallery-sync-20260915-2";
+const ASSET_VERSION = "protected-gallery-layout-20260915-3";
 const galleryData = window.galleryData || { event: [], studio: [], post: [], outdoor: [] };
 const allItems = [];
 let currentIndex = 0;
@@ -114,7 +114,8 @@ function renderGallery(config) {
   items.forEach((item, index) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = `photo-tile ${item.tile || getTileClass(index, config.shape)}`;
+    const orientationClass = item.orientation === "portrait" ? "is-portrait" : "is-landscape";
+    button.className = `photo-tile ${orientationClass}`;
     button.dataset.index = String(offset + index);
     button.style.transitionDelay = `${Math.min(index * 42, 360)}ms`;
     button.setAttribute("role", "listitem");

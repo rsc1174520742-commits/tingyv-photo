@@ -90,28 +90,13 @@ def js_string(value: str) -> str:
     return value.replace("\\", "\\\\").replace('"', '\\"')
 
 
-def tile_for(category: str, index: int) -> str:
-    if category == "studio":
-        return (
-            "tile-hero",
-            "tile-feature",
-            "tile-wide",
-            "tile-wide",
-            "tile-mid",
-            "tile-mid",
-        )[index % 6]
-    return (
-        "tile-wide",
-        "tile-mid",
-        "tile-wide",
-        "tile-mid",
-        "tile-tall",
-        "tile-feature",
-    )[index % 6]
+def orientation_for(source: Path) -> str:
+    with Image.open(source) as image:
+        return "portrait" if image.height > image.width else "landscape"
 
 
 def sync_categories() -> None:
-    gallery_items: dict[str, list[tuple[str, str, str, int]]] = {}
+    gallery_items: dict[str, list[tuple[str, str, str, str]]] = {}
     for category in CATEGORY_SOURCES:
         clear_public_category(category)
         entries = []
@@ -123,7 +108,7 @@ def sync_categories() -> None:
                     f"{TITLE_PREFIXES[category]} Frame {number:02d}",
                     f"./assets/images/{category}/{stem}-thumb.jpg",
                     f"./assets/images/{category}/{stem}-display.jpg",
-                    number - 1,
+                    orientation_for(source),
                 )
             )
             print(f"processed {category}/{source.name} -> {stem}")
@@ -132,10 +117,10 @@ def sync_categories() -> None:
     lines = ["window.galleryData = {"]
     for category, category_items in gallery_items.items():
         lines.append(f"  {category}: [")
-        for title, thumb, display, index in category_items:
+        for title, thumb, display, orientation in category_items:
             lines.append(
                 f'    {{ title: "{js_string(title)}", thumb: "{thumb}", '
-                f'display: "{display}", tile: "{tile_for(category, index)}" }},'
+                f'display: "{display}", orientation: "{orientation}" }},'
             )
         lines.append("  ],")
     lines.append("};")

@@ -499,6 +499,8 @@ h3 {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 14px;
+  grid-auto-flow: dense;
+  align-items: start;
 }
 
 .photo-tile {
@@ -629,6 +631,19 @@ h3 {
 .photo-tile.tile-panorama {
   grid-column: span 8;
   min-height: 320px;
+}
+
+/* Keep landscape and portrait work on a predictable rhythm without stretching the source composition. */
+.photo-tile.is-landscape {
+  grid-column: span 6;
+  min-height: 0;
+  aspect-ratio: 3 / 2;
+}
+
+.photo-tile.is-portrait {
+  grid-column: span 3;
+  min-height: 0;
+  aspect-ratio: 2 / 3;
 }
 
 .service-grid {
@@ -1062,6 +1077,18 @@ h3 {
     min-height: 300px;
   }
 
+  .photo-tile.is-landscape {
+    grid-column: span 6;
+    min-height: 0;
+    aspect-ratio: 3 / 2;
+  }
+
+  .photo-tile.is-portrait {
+    grid-column: span 3;
+    min-height: 0;
+    aspect-ratio: 2 / 3;
+  }
+
   .service-grid {
     grid-template-columns: 1fr;
   }
@@ -1135,7 +1162,8 @@ h3 {
   }
 
   .gallery {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
   .photo-tile,
@@ -1153,6 +1181,18 @@ h3 {
   .photo-tile.tile-panorama {
     grid-column: auto;
     min-height: 310px;
+  }
+
+  .photo-tile.is-landscape {
+    grid-column: span 2;
+    min-height: 0;
+    aspect-ratio: 3 / 2;
+  }
+
+  .photo-tile.is-portrait {
+    grid-column: span 1;
+    min-height: 0;
+    aspect-ratio: 2 / 3;
   }
 
   .site-footer {
